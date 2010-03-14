@@ -16,6 +16,7 @@ TODO:
 - Handle errors properly
 - Allow comparison of retrieved values in parser.
 - Add a more verbose syntax than the current csv file
+- Add example entries for tomcat and jboss.
 
 Usage:
 
