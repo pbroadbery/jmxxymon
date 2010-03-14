@@ -2,20 +2,77 @@
 
 JMX monitor for xymon/big brother.
 
-This is version 0.00001 - it compiles, it does some useful
-stuff (I use it to monitor java systems at work), but it's still not 100% feature complete or
-easy to use. 
+This is version 0.00001 - it compiles, it does some useful stuff (I
+use it to monitor java systems at work), but it's still not 100%
+feature complete or easy to use.
 
 Useful for monitoring tomcats, jbosses, etc.
 
-Compile the code, see the test directory for examples, write a shell script to wrap the java calls.
+Compile the code, see the test directory for examples, write a shell
+script to wrap the java calls.
 
 TODO: 
 - Rework the grammar to allow more interesting tests.
 - Handle errors properly
 - Allow comparison of retrieved values in parser.
+- Add a more verbose syntax than the current csv file
 
+Usage:
 
+Compile into a .jar file (eclipse: export as an executable jar file)
+jmxxymon.jar
+
+Use a wrapper script similar to:
+
+set -e
+wd=$(/bin/pwd)
+tmpdir=/tmp/jmxxmon-$$
+mkdir $tmpdir
+cd $tmpdir
+java -jar jmxxymon.jar $BBHOME/etc/cfgfile
+for i in *.result; do bb xymonhost $i; done
+cd $wd
+rm -rf $tmpdir
+
+Call the script from hobbitlaunch.cfg.
+
+You'll probably wind up having one cfgfile per host or subsystem or
+whatever.  Loop through them or have a hobbitlaunch.cfd entry for each
+config file.
+
+Config file.
+
+The config file is a comma separated format; lines starting with '#'
+are ignored.
+
+localhost,javatest,SystemLoadAverage,1099,java.lang,OperatingSystem,SystemLoadAverage,lessThan(5)
+
+Each field is as follows: 
+
+hostName - Name of the host running the process to be monitored.  It
+is either just the name, or of the form logicalName@realName, which
+will use the logicalName in the xymon display, but actually connect to
+realName. 
+columnName - Name of column to be displayed in xymon.
+valueName - Name of value to be displayed in xymon
+portNumber - port running the jmx interface
+objectName - name of object containing the value to be displayed
+attributeName - attribute to be displayed
+test - optional test
+
+Running the program will create a file for each distinct logical host
+name of the form hostname-javatest.result.  This file can then be
+given to xymon.
+
+The example above produced output like:
+
+status localhost.javatest green Sun Mar 14 12:38:55 GMT 2010
+SystemLoadAverage: 1.38
+
+At least when I ran it once.  If load average increased, then the
+green would be replaced by red, and so xymon would display an alert.
+
+-----------------------------------------
 
 
 
