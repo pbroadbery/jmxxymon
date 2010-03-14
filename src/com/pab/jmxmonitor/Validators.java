@@ -16,8 +16,9 @@ public class Validators {
 		validatorMap.put("lessThan", lessThan());
 		validatorMap.put("and", new AndConstructor());
 		validatorMap.put("or", new OrConstructor());
+//		validatorMap.put("shouldBe", new ShouldBe.Constructor());
 		validatorMap.put("notNull", new FixedConstructor(new NotNullValidator()));
-		validatorMap.put("moreRecentThan", recent());
+//		validatorMap.put("moreRecentThan", recent());
 	}
 	
 	public static Validator.Constructor lookup(String string) {
