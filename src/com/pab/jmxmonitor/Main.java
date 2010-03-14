@@ -277,9 +277,9 @@ public class Main {
 		 * @return
 		 */
 		public String bbResult() {
-			String txt = "status " + hostName + "." + subsystem + " " + status + " " + new Date();
+			String txt = "status " + hostName + "." + subsystem + " " + status + " " + new Date() + "\n";
 			for (String s: texts) {
-				txt += "\n" + s;
+				txt += s + "\n";
 			}
 			return txt;
 		}
@@ -343,7 +343,6 @@ public class Main {
 		catch (AttributeNotFoundException e) {
 			e.printStackTrace();
 		} catch (InstanceNotFoundException e) {
-			System.out.println("objName not found: " + e.getMessage());
 		} catch (MBeanException e) {
 			e.printStackTrace();
 		} catch (ReflectionException e) {
@@ -358,7 +357,6 @@ public class Main {
 		catch (RuntimeException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Failed to retrieve attribute: " + m); 
 		return null;
 	}
 
