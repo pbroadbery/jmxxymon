@@ -1,0 +1,21 @@
+
+
+JMX monitor for xymon/big brother.
+
+This is version 0.00001 - it compiles, it does some useful
+stuff (I use it to monitor java systems at work), but it's still not 100% feature complete or
+easy to use. 
+
+Useful for monitoring tomcats, jbosses, etc.
+
+Compile the code, see the test directory for examples, write a shell script to wrap the java calls.
+
+TODO: 
+- Rework the grammar to allow more interesting tests.
+- Handle errors properly
+- Allow comparison of retrieved values in parser.
+
+
+
+
+
