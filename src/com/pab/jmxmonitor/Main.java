@@ -432,6 +432,9 @@ public class Main {
 				List<Monitorable> l = new LinkedList<Monitorable>();
 				String line;
 				while ( (line = rdr.readLine()) != null) {
+					if (line.startsWith("#"))
+						continue;
+					
 					String[] args = line.split(",");
 					if (args.length < 5)
 						continue;
@@ -480,7 +483,7 @@ public class Main {
 			}
 			else {
 				logicalHostName = hostName.substring(0, hostName.indexOf("@"));
-				hostName = hostName.substring(hostName.indexOf("@"));
+				hostName = hostName.substring(hostName.indexOf("@") + 1);
 			}
 			if (args.size() <= 7)
 				validator = "ok";
