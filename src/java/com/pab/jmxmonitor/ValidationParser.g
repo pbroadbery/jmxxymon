@@ -21,7 +21,7 @@ parenexpr returns [Validator value ]: v=var { $value = Env.construct((Validator.
 commalist returns [ List<Object> l]: e1=expr { l=new LinkedList<Object>(); $l.add(e1);} (COMMA e2=expr { $l.add(e2); })*;
 
 expr returns [ Object value ]:
-    s=STRING {$value=$s.text;} 
+    s=STRING {String tmp = $s.text; tmp = tmp.substring(0, tmp.length()-1); $value=tmp.substring(1);} 
     | i=INTEGER { $value=Integer.parseInt($i.text);}
     | p=parenexpr { $value=p;};
    

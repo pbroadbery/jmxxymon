@@ -249,6 +249,12 @@ public class Main {
 			for (String s: texts) {
 				txt += s + "\n";
 			}
+			if (!errors.isEmpty())
+				txt += "\n";
+			for (String msg: errors) {
+				txt += msg + "\n";
+			}
+			
 			return txt;
 		}
 		
@@ -256,7 +262,7 @@ public class Main {
 			this.status = max(this.status, status.getCode());
 			texts.add(attrName + ": " + value);
 			if (status.getErrorMessage() != null)
-				errors.add(status.getErrorMessage());
+				errors.add("Error (" + attrName + ") - " + status.getErrorMessage());
 		}
 	}
 	
