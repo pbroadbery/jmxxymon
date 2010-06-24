@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,10 +44,10 @@ import org.antlr.runtime.RecognitionException;
 
 public class Main {
 	private static Logger LOG = Logger.getLogger(Main.class.getName());
-	private Map<JmxId, MBeanConn> regMap = new HashMap<JmxId, MBeanConn>();
 	private MonitorDao monitorDao = new MonitorDao();
 	private List<Exception> badExceptions = new LinkedList<Exception>();
 	private ValidationParser parser = new ValidationParser(null);
+	private JmxConnectionPool connPool = new JmxConnectionPool();
 	
 	static public void main(String[] args) {
 		(new Main()).run(args);
@@ -82,7 +83,7 @@ public class Main {
 		}
 
 		try {
-			closeMbscs();
+			connPool.closeMbscs();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -130,10 +131,14 @@ public class Main {
 		}
 		
 		for (JmxId url: urls) {
+			MBeanConn connInfo = connPool.lookupConnInfo(url);
+			if (connInfo.isBad())
+				LOG.warning("Bad connection: " + url + " " + connInfo.e.getMessage());
+		}
+		for (JmxId url: urls) {
 			try {
-				MBeanServerConnection conn = lookupMbsc(url);
+				MBeanServerConnection conn = connPool.lookupMbsc(url);
 				if (conn == null) {
-					LOG.warning("Connection is down: " + url);
 					continue;
 				}
 				
@@ -311,7 +316,9 @@ public class Main {
 	
 	private Object readAttributeByObjName(ObjectName objName, Monitorable m) {
 		try {
-			MBeanServerConnection mbsc = lookupMbsc(m.getJmxId());
+			MBeanServerConnection mbsc = connPool.lookupMbsc(m.getJmxId());
+			if (mbsc == null)
+				return null;
 			Object o = mbsc.getAttribute(objName, m.getAttributeName());
 			LOG.fine("Value of: " + objName + " = " + o);
 			if (m.getAttributeKey() != null) {
@@ -343,46 +350,86 @@ public class Main {
 		return null;
 	}
 
-	MBeanServerConnection lookupMbsc(JmxId url) throws IOException {
-		if (regMap.get(url) != null) {
-			return regMap.get(url).mbsc;
+	static class JmxConnectionPool {
+		private Map<JmxId, MBeanConn> regMap = new HashMap<JmxId, MBeanConn>();
+		
+		MBeanServerConnection lookupMbsc(JmxId url) {
+			if (regMap.get(url) != null) {
+				return regMap.get(url).mbsc;
+			}
+			
+			MBeanConn conn;
+			try {
+				conn = connectMbsc(url);
+				regMap.put(url, conn);
+				return conn.mbsc;
+			} catch (IOException e) {
+				regMap.put(url, new MBeanConn(e));
+				return null;
+			}
+			
+		}
+
+		public MBeanConn lookupConnInfo(JmxId id) {
+			return regMap.get(id);
+		}
+
+		Collection<MBeanConn> getBadConnections() {
+			LinkedList<MBeanConn> badConnList = new LinkedList<MBeanConn>();
+			for (MBeanConn c: regMap.values()) {
+				if (c.isBad())
+					badConnList.add(c);
+			}
+			return badConnList;
 		}
 		
-		MBeanConn conn = connectMbsc(url);
-		regMap.put(url, conn);
-		return conn.mbsc;
-	}
-	
-	void closeMbscs() throws IOException {
-		for (MBeanConn mc: regMap.values()) {
-			mc.c.close();
+		MBeanConn connectMbsc(JmxId id) throws IOException  {
+			JMXServiceURL surl = new JMXServiceURL(id.url);
+
+	        Map<String, String[]> env = new HashMap<String, String[]>();
+	        if (id.user != null) {
+	        	env.put(JMXConnector.CREDENTIALS,
+	        			new String[] {id.user, id.password});
+	        }
+	        
+	        JMXConnector conn =  JMXConnectorFactory.connect(surl, env);
+			MBeanServerConnection mbsc = conn.getMBeanServerConnection();
+					
+			return new MBeanConn(conn, mbsc);
+		}
+
+		void closeMbscs() throws IOException {
+			for (MBeanConn mc: regMap.values()) {
+				if (!mc.isBad())
+					
+					mc.c.close();
+			}
 		}
 	}
+	
+	
 	
 	static class MBeanConn {
 		JMXConnector c;
 		MBeanServerConnection mbsc;
-
+		IOException e;
+		
 		public MBeanConn(JMXConnector conn, MBeanServerConnection mbsc2) {
 			this.c = conn;
 			this.mbsc = mbsc2;
 		}
-}
-	
-	MBeanConn connectMbsc(JmxId id) throws IOException  {
-		JMXServiceURL surl = new JMXServiceURL(id.url);
+		
+		public MBeanConn(IOException e) {
+			this.e = e;
+		}
 
-        Map<String, String[]> env = new HashMap<String, String[]>();
-        if (id.user != null) {
-        	env.put(JMXConnector.CREDENTIALS,
-        			new String[] {id.user, id.password});
-        }
-        
-        JMXConnector conn =  JMXConnectorFactory.connect(surl, env);
-		MBeanServerConnection mbsc = conn.getMBeanServerConnection();
-				
-		return new MBeanConn(conn, mbsc);
+		boolean isBad() {
+			return e != null;
+		}
+		
+		
 	}
+	
 	
 	/**
 	 * Test DAO object
@@ -436,7 +483,7 @@ public class Main {
 		}
 	}
 
-	class Monitorable {
+	static class Monitorable {
 		String hostName;
 		String logicalHostName;
 		String subsystem;
