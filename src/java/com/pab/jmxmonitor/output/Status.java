@@ -1,17 +1,19 @@
 /**
  * 
  */
-package com.pab.jmxmonitor;
+package com.pab.jmxmonitor.output;
+
 
 public class Status {
-	StatusCode code;
-	String errorMessage;
-
-	Status(StatusCode code) {
+	private StatusCode code;
+	private String errorMessage;
+	private String value;
+	
+	public Status(StatusCode code) {
 		this(code, null);
 	}
 
-	Status(StatusCode code, String errorMessage) {
+	public Status(StatusCode code, String errorMessage) {
 		this.code = code;
 		this.errorMessage = errorMessage;
 	}
@@ -38,6 +40,14 @@ public class Status {
 
 	public Status and(Status test) {
 		return new Status(this.getCode().and(test.getCode()), safeConcat(errorMessage, test.getErrorMessage())); 
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public String getValue() {
+		return value;
 	}
 	
 }

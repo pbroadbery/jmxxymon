@@ -1,4 +1,4 @@
-package com.pab.jmxmonitor;
+package com.pab.jmxmonitor.output;
 
 /**
  * Quick and dirty type representing status

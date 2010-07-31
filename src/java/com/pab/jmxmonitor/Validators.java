@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.pab.jmxmonitor.output.Status;
+import com.pab.jmxmonitor.output.StatusCode;
+
 
 
 public class Validators {

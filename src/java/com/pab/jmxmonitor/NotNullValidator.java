@@ -1,5 +1,8 @@
 package com.pab.jmxmonitor;
 
+import com.pab.jmxmonitor.output.Status;
+import com.pab.jmxmonitor.output.StatusCode;
+
 
 public class NotNullValidator implements Validator {
 
