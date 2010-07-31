@@ -2,8 +2,6 @@ package com.pab.jmxmonitor.input;
 
 import java.util.List;
 
-import com.pab.jmxmonitor.Main;
-
 public class Monitorable {
 	String hostName;
 	String logicalHostName;

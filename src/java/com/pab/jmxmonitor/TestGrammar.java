@@ -8,6 +8,7 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
+@SuppressWarnings("deprecation")
 public class TestGrammar {
 
 	public static void main(String[] args) {
@@ -24,7 +25,9 @@ public class TestGrammar {
 			input = new ANTLRInputStream(new StringBufferInputStream(s));
 			Javalex l = new Javalex(input);
 			ValidationParser p = new ValidationParser(new CommonTokenStream(l));
+			@SuppressWarnings("unused")
 			Validator v = p.whole();
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

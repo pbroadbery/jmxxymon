@@ -3,31 +3,17 @@ package com.pab.jmxmonitor;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
-import com.pab.jmxmonitor.input.JmxId;
 import com.pab.jmxmonitor.input.Monitorable;
 import com.pab.jmxmonitor.output.MonitorResult;
 import com.pab.jmxmonitor.output.Outputter;
-import com.pab.jmxmonitor.output.Status;
-import com.pab.jmxmonitor.output.StatusLine;
 import com.pab.jmxmonitor.output.XymonFileOutputter;
 
 /**

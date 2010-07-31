@@ -12,7 +12,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.RuntimeMBeanException;
-import javax.management.openmbean.CompositeDataSupport;
 import javax.management.remote.JMXConnector;
 
 import com.pab.jmxmonitor.input.Monitorable;
